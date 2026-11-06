@@ -1,0 +1,28 @@
+#include "stm32f4xx.h"
+
+void GPIO_Init(void) {
+    // Enable clock for GPIOA (for LED) and GPIOC (for Button)
+    RCC->AHB1ENR |= (1 << 0) | (1 << 2);
+
+    // Set PA5 as output (LED)
+    GPIOA->MODER &= ~(3 << (5 * 2));
+    GPIOA->MODER |=  (1 << (5 * 2));
+
+    // Set PC13 as input (Push Button)
+    GPIOC->MODER &= ~(3 << (13 * 2));
+}
+
+int main(void) {
+    GPIO_Init();
+
+    while (1) {
+        // Check if button is pressed (PC13)
+        if (!(GPIOC->IDR & (1 << 13))) {
+            // Turn on LED (PA5 High)
+            GPIOA->ODR |= (1 << 5);
+        } else {
+            // Turn off LED (PA5 Low)
+            GPIOA->ODR &= ~(1 << 5);
+        }
+    }
+}
